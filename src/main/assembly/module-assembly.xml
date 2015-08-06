@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<assembly
+	xmlns="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.2"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.2 http://maven.apache.org/xsd/assembly-1.1.2.xsd">
+	<id>module</id>
+	<formats>
+		<format>zip</format>
+	</formats>
+	<includeBaseDirectory>false</includeBaseDirectory>
+	<files>
+		<file>
+			<source>${project.build.directory}/${artifactId}-${version}.${packaging}</source>
+			<outputDirectory>modules/system/layers/base/de/zalando/jgroups-native-s3-ping/main</outputDirectory>
+			<destName>jgroups-native-s3-ping.jar</destName>
+		</file>
+	</files>
+	<fileSets>
+		<fileSet>
+			<directory>${project.basedir}/src/main/resources/module/main</directory>
+			<outputDirectory>modules/system/layers/base/de/zalando/jgroups-native-s3-ping/main</outputDirectory>
+			<includes>
+				<include>module.xml</include>
+			</includes>
+		</fileSet>
+
+		<!-- AWS -->
+
+		<fileSet>
+			<directory>${project.basedir}/src/main/resources/other-modules/com/amazonaws/aws-java-sdk-core/main</directory>
+			<outputDirectory>modules/system/layers/base/com/amazonaws/aws-java-sdk-core/main</outputDirectory>
+			<includes>
+				<include>module.xml</include>
+			</includes>
+		</fileSet>
+		<fileSet>
+			<directory>${project.basedir}/src/main/resources/other-modules/com/amazonaws/aws-java-sdk-kms/main</directory>
+			<outputDirectory>modules/system/layers/base/com/amazonaws/aws-java-sdk-kms/main</outputDirectory>
+			<includes>
+				<include>module.xml</include>
+			</includes>
+		</fileSet>
+		<fileSet>
+			<directory>${project.basedir}/src/main/resources/other-modules/com/amazonaws/aws-java-sdk-s3/main</directory>
+			<outputDirectory>modules/system/layers/base/com/amazonaws/aws-java-sdk-s3/main</outputDirectory>
+			<includes>
+				<include>module.xml</include>
+			</includes>
+		</fileSet>
+	</fileSets>
+	<dependencySets>
+		<dependencySet>
+			<useTransitiveDependencies>true</useTransitiveDependencies>
+			<useTransitiveFiltering>true</useTransitiveFiltering>
+			<outputDirectory>modules/system/layers/base/com/amazonaws/aws-java-sdk-core/main</outputDirectory>
+			<includes>
+				<include>com.amazonaws:aws-java-sdk-core</include>
+				<include>commons-logging:commons-logging</include>
+				<include>org.apache.httpcomponents:httpcore</include>
+				<include>org.apache.httpcomponents:httpclient</include>
+			</includes>
+			<excludes>
+				<exclude>joda-time:joda-time</exclude>
+				<exclude>com.fasterxml.jackson.core:jackson-databind</exclude>
+				<exclude>commons-codec:commons-codec</exclude>
+			</excludes>
+		</dependencySet>
+		<dependencySet>
+			<useTransitiveDependencies>true</useTransitiveDependencies>
+			<useTransitiveFiltering>true</useTransitiveFiltering>
+			<outputDirectory>modules/system/layers/base/com/amazonaws/aws-java-sdk-kms/main</outputDirectory>
+			<includes>
+				<include>com.amazonaws:aws-java-sdk-kms</include>
+			</includes>
+		</dependencySet>
+		<dependencySet>
+			<useTransitiveDependencies>true</useTransitiveDependencies>
+			<useTransitiveFiltering>true</useTransitiveFiltering>
+			<outputDirectory>modules/system/layers/base/com/amazonaws/aws-java-sdk-s3/main</outputDirectory>
+			<includes>
+				<include>com.amazonaws:aws-java-sdk-s3</include>
+			</includes>
+			<excludes>
+				<exclude>com.amazonaws:aws-java-sdk-core</exclude>
+				<exclude>com.amazonaws:aws-java-sdk-kms</exclude>
+			</excludes>
+		</dependencySet>
+
+	</dependencySets>
+</assembly>
