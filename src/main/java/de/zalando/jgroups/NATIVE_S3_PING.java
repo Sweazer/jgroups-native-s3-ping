@@ -248,26 +248,33 @@ public class NATIVE_S3_PING extends FILE_PING {
             }
             
             List<S3ObjectSummary> summaries = objectListing.getObjectSummaries();
-            String[] keys = new String[summaries.size()];
             
-            for (int i = 0; i < keys.length; i++) {
-                keys[i] = summaries.get(i).getKey();
-            }
-            
-            if (log.isDebugEnabled()) {
-                log.debug("fetched S3 file key for deletion from: %s", clusterPrefix);
-                for (String key : keys) {
-                    log.debug("deleting S3 file: %s", key);
-                }
-            }
-            
-            DeleteObjectsResult result = s3.deleteObjects(new DeleteObjectsRequest(bucketName).withQuiet(true).withKeys(keys));
-            
-            if (log.isDebugEnabled()) {
-                log.debug("deleted S3 files from: %s", clusterPrefix);
-                for (DeleteObjectsResult.DeletedObject o : result.getDeletedObjects()) {
-                    log.debug("deleted S3 file: %s", o.getKey());
-                }
+            if (!summaries.isEmpty()) {
+	            String[] keys = new String[summaries.size()];
+	            
+	            for (int i = 0; i < keys.length; i++) {
+	                keys[i] = summaries.get(i).getKey();
+	            }
+	            
+	            if (log.isDebugEnabled()) {
+	                log.debug("fetched S3 file key for deletion from: %s", clusterPrefix);
+	                for (String key : keys) {
+	                    log.debug("deleting S3 file: %s", key);
+	                }
+	            }
+	            
+	            DeleteObjectsResult result = s3.deleteObjects(new DeleteObjectsRequest(bucketName).withQuiet(true).withKeys(keys));
+	            
+	            if (log.isDebugEnabled()) {
+	                log.debug("deleted S3 files from: %s", clusterPrefix);
+	                for (DeleteObjectsResult.DeletedObject o : result.getDeletedObjects()) {
+	                    log.debug("deleted S3 file: %s", o.getKey());
+	                }
+	            }
+            } else {
+	            if (log.isDebugEnabled()) {
+	                log.debug("no S3 files to delete in: %s", clusterPrefix);
+	            }
             }
         } catch (final Exception e) {
             log.error(String.format("failed to delete all files in Amazon S3 [%s]", clusterPrefix), e);
