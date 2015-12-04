@@ -32,6 +32,23 @@
         <url>git@github.com:zalando/jgroups-native-s3-ping.git</url>
       <tag>HEAD</tag>
   </scm>
+  
+  <repositories>
+  	<repository>
+        <id>jboss-snapshots-repository</id>
+        <name>JBoss Nexus snapshots repository</name>
+        <url>https://repository.jboss.org/nexus/content/repositories/snapshots/</url>
+        <layout>default</layout>
+        <releases>
+            <enabled>false</enabled>
+            <updatePolicy>never</updatePolicy>
+        </releases>
+        <snapshots>
+            <enabled>true</enabled>
+            <updatePolicy>interval:120</updatePolicy>
+        </snapshots>
+    </repository>
+  </repositories>
 
     <distributionManagement>
         <snapshotRepository>
@@ -48,7 +65,7 @@
         <dependency>
             <groupId>org.jgroups</groupId>
             <artifactId>jgroups</artifactId>
-            <version>3.6.4.Final</version>
+            <version>3.6.7-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
 
