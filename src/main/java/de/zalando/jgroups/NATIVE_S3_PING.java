@@ -261,7 +261,7 @@ public class NATIVE_S3_PING extends FILE_PING {
                 }
             }
             
-            DeleteObjectsResult result = s3.deleteObjects(new DeleteObjectsRequest(bucketName).withKeys(keys));
+            DeleteObjectsResult result = s3.deleteObjects(new DeleteObjectsRequest(bucketName).withQuiet(true).withKeys(keys));
             
             if (log.isDebugEnabled()) {
                 log.debug("deleted S3 files from: %s", clusterPrefix);
