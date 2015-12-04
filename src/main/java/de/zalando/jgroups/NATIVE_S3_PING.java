@@ -16,6 +16,7 @@ import org.jgroups.util.Responses;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.util.List;
 
 /**
@@ -204,7 +205,73 @@ public class NATIVE_S3_PING extends FILE_PING {
 
     @Override
     protected void remove(final String clustername, final Address addr) {
-        // our server can get killed all the time, don't depend on cleanup on shudown
+        if(clustername == null || addr == null)
+            return;
+
+        final String filename = addressToFilename(local_addr);
+        final String key = getClusterPrefix(clustername) + filename;
+        
+        try {
+            if (log.isTraceEnabled()) {
+                log.trace("deleting S3 file: %s", key);
+            }
+            
+            s3.deleteObject(bucketName, key);
+
+            if (log.isDebugEnabled()) {
+                log.debug("deleted S3 file: %s", key);
+            }
+        } catch (final Exception e) {
+            log.error(String.format("failed to delete file in Amazon S3 [%s]", key), e);
+        }
+    }
+
+    @Override
+    protected void removeAll(final String clustername) {
+        if(clustername == null)
+            return;
+
+        final String clusterPrefix = getClusterPrefix(clustername);
+
+        if (log.isTraceEnabled()) {
+            log.trace("getting entries for %s ...", clusterPrefix);
+        }
+
+        try {
+            final ObjectListing objectListing = s3.listObjects(
+                    new ListObjectsRequest()
+                            .withBucketName(bucketName)
+                            .withPrefix(clusterPrefix));
+            
+            if (log.isTraceEnabled()) {
+                log.trace("got object listing, %d entries [%s]", objectListing.getObjectSummaries().size(), clusterPrefix);
+            }
+            
+            List<S3ObjectSummary> summaries = objectListing.getObjectSummaries();
+            String[] keys = new String[summaries.size()];
+            
+            for (int i = 0; i < keys.length; i++) {
+                keys[i] = summaries.get(i).getKey();
+            }
+            
+            if (log.isDebugEnabled()) {
+                log.debug("fetched S3 file key for deletion from: %s", clusterPrefix);
+                for (String key : keys) {
+                    log.debug("deleting S3 file: %s", key);
+                }
+            }
+            
+            DeleteObjectsResult result = s3.deleteObjects(new DeleteObjectsRequest(bucketName).withKeys(keys));
+            
+            if (log.isDebugEnabled()) {
+                log.debug("deleted S3 files from: %s", clusterPrefix);
+                for (DeleteObjectsResult.DeletedObject o : result.getDeletedObjects()) {
+                    log.debug("deleted S3 file: %s", o.getKey());
+                }
+            }
+        } catch (final Exception e) {
+            log.error(String.format("failed to delete all files in Amazon S3 [%s]", clusterPrefix), e);
+        }
     }
 
     public static void registerProtocolWithJGroups(short magicNumber) {
